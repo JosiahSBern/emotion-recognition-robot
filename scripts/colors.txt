@@ -1,0 +1,6 @@
+happy /1e-10/
+angry /1e-10/
+sad /1e-10/
+surprise /1e-10/
+exit /1e-10/
+
