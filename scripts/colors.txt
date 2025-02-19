@@ -1,6 +1,26 @@
-happy /1e-10/
-angry /1e-10/
-sad /1e-10/
-surprise /1e-10/
-exit /1e-10/
+
+
+Joyful
+Yellow: #e0c158
+
+Sad
+Blue: #6da7d1 
+
+Anger
+Redish/Pink: #ce8271
+
+Fear
+Turquoise/Darkish green: #59b59d
+
+Confident
+light green: #d3e7b3
+
+Happy
+Very Light Green: #edf5e0
+
+Frustrated
+Lighter redish/pink: #daa194
+
+Tired
+Paleish Blue: #cad4e1
 
