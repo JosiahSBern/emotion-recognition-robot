@@ -66,7 +66,8 @@ def main():
         if emotion == "exit":
             rospy.loginfo("Exiting...")
             sys.exit()
-        bot.executeEmotion(emotion)
+        
+
 
 
 if __name__ == "__main__":
@@ -76,10 +77,6 @@ if __name__ == "__main__":
         pass
 
 
-
-
-
-        
 
 
 if __name__ == "__main__":
