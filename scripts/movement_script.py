@@ -10,9 +10,11 @@ import os
 class Turtlebot:
     def __init__(self):
         # Initialize ROS Node
-        rospy.init_node('emotion_based_movement')
+        if not rospy.core.is_initialized():
+            rospy.init_node('emotion_based_movement', anonymous=True)
 
-        cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
         rospy.sleep(1)  
 
         #Array of emotions movesments (duration,linar_velocity, angular_velocityt)
@@ -30,7 +32,7 @@ class Turtlebot:
         }
 
         
-    def autonomousMovement(duration, linear_vel, angular_vel):
+    def autonomousMovement(self,duration, linear_vel, angular_vel):
 
         move_cmd = Twist()
         move_cmd.linear.x = linear_vel
@@ -40,20 +42,20 @@ class Turtlebot:
         rate = rospy.Rate(10)
 
         while not rospy.is_shutdown() and (rospy.get_time() - start_time) < duration:
-            cmd_vel_pub.publish(move_cmd)
+            self.cmd_vel_pub.publish(move_cmd)
             rate.sleep()
 
         # Stop the robot
         move_cmd.linear.x = 0.0
         move_cmd.angular.z = 0.0
-        cmd_vel_pub.publish(move_cmd)
+        self.cmd_vel_pub.publish(move_cmd)
         # rospy.loginfo(f"'{name}' movement completed.")
     
     def executeEmotion(self,emotion):
         if emotion in self.emotion:
             rospy.loginfo(f"Executing {emotion} script")
-            for duration,linear_vel,angular_vel in self.emotions[emotion]:
-                autonomousMovement(duration,linear_vel,angular_vel)
+            for duration, linear_vel, angular_vel in self.emotion[emotion]:
+                self.autonomousMovement(duration,linear_vel,angular_vel)
         else:
             rospy.loginfo("Unknown emotion entered. Please try again")
 
@@ -63,21 +65,11 @@ def main():
     while not rospy.is_shutdown():
         print("Available Emotions: ", bot.emotion.keys())
         emotion = input("Enter an emotion: ").strip().lower()
+        bot.executeEmotion(emotion)
         if emotion == "exit":
             rospy.loginfo("Exiting...")
             sys.exit()
         
-
-
-
-if __name__ == "__main__":
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
-
-
-
 
 if __name__ == "__main__":
     try:
