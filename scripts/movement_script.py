@@ -20,7 +20,7 @@ class Turtlebot:
         #Array of emotions movesments (duration,linar_velocity, angular_velocityt)
 
         self.emotion = {
-            "joyful" : [( 2, 0.4, 2), (2, 0.4, 2), (1, 0.6, 0)],
+            "excited" : [( 2, 0.4, 2), (2, 0.4, 2), (1, 0.6, 0)],
             "sad" : [(1.5,-0.2,0.55),(1.5,-0.2,-0.6)],
             "anger":[( 5, 0.1, -1.0)],
             "fear": [( 1.5, -0.7, -0.6)],
@@ -30,6 +30,18 @@ class Turtlebot:
             "tired":[(5, 0.1, 0)],
             "neutral":[],
         }
+        self.synonyms = {
+            "excited": ["excited", "eager", "enthusiastic"],
+            "sad": ["sad", "unhappy", "down", "depressed"],
+            "anger": ["angry", "mad", "irritated", "frustrated"],
+            "fear": ["fearful", "scared", "terrified", "anxious"],
+            "confident": ["confident", "secure", "assured"],
+            "happy": ["happy", "joyful", "content", "pleased"],
+            "frustrated": ["frustrated", "annoyed", "irritated"],
+            "tired": ["tired", "exhausted", "fatigued"],
+            "neutral": ["neutral", "calm", "indifferent"]
+        }
+        
 
         
     def autonomousMovement(self,duration, linear_vel, angular_vel):
@@ -51,13 +63,21 @@ class Turtlebot:
         self.cmd_vel_pub.publish(move_cmd)
         # rospy.loginfo(f"'{name}' movement completed.")
     
-    def executeEmotion(self,emotion):
-        if emotion in self.emotion:
-            rospy.loginfo(f"Executing {emotion} script")
-            for duration, linear_vel, angular_vel in self.emotion[emotion]:
-                self.autonomousMovement(duration,linear_vel,angular_vel)
+    def executeEmotion(self, emotion):
+        # Check if emotion or any of its synonyms exist
+        for key, value in self.synonyms.items():
+            if emotion in value:
+                emotion = key  # Map to the canonical emotion key
+                rospy.loginfo(f"Executing {emotion} movement script")
+                if self.emotion[emotion]:  # Check for non-empty list
+                    for duration, linear_vel, angular_vel in self.emotion[emotion]:
+                        self.autonomousMovement(duration, linear_vel, angular_vel)
+                else:
+                    rospy.loginfo(f"Neutral emotion: No movement.")
+                break
         else:
-            rospy.loginfo("Unknown emotion entered. Please try again")
+            rospy.loginfo("Unknown emotion entered. Please try again.")
+
 
 
 def main():
