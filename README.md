@@ -7,6 +7,15 @@ Using a TurtleBot2, we have created a fully simulated environment where the robo
 - Expressive Feedback through Motions
 - Text-to-Speech Implementation
 - Interactive Storytelling
+
+## Demo Videos
+https://www.youtube.com/watch?v=ex3C3DqqgT4&ab_channel=JosiahBernard
+https://www.youtube.com/watch?v=VjtF1hjslPo&feature=youtu.be
+
+
+### Movement Test
+https://www.youtube.com/watch?v=vQfkGtvN2HY&feature=youtu.be
+
 ## Future Implementations
 - Expand TTS Capabilities and more human speech
 - Collision Detection & Safety Measures
