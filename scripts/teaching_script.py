@@ -11,7 +11,6 @@ from collections import defaultdict
 
 
 
-SCRIPT_BASE_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
 import os
@@ -24,8 +23,7 @@ class Story:
 
 
 # Initialize ROS and robot components
-if not rospy.core.is_initialized():
-    rospy.init_node('teaching_node', anonymous=True)
+rospy.init_node('teaching_node', anonymous=True)
 robot = Turtlebot()
 tts = TextToSpeech()
 
@@ -137,8 +135,10 @@ def show_story(window, story_index):
             widget.destroy()
 
         story = stories[story_index]
+
+        base_path = "/home/ros/catkin_ws/src/emotion_based_turtlebot/scripts"
     
-        image_path = os.path.join(SCRIPT_BASE_PATH, story.image_path)
+        image_path = os.path.join(base_path, story.image_path)
 
         try:
             img = Image.open(image_path)  

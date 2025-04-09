@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from PIL import Image, ImageTk
 import json
+import tkinter as tk
+import random
 import rospy
 from movement_script import Turtlebot
 from TTS_script import TextToSpeech
@@ -23,8 +25,7 @@ class Story:
         self.image_path = image_path
 
 # Initialize ROS and robot components
-if not rospy.core.is_initialized():
-    rospy.init_node('storytelling_node', anonymous=True)
+rospy.init_node('storytelling_node', anonymous=True)
 robot = Turtlebot()
 tts = TextToSpeech()
 MAX_QUESTIONS = 5
@@ -92,7 +93,6 @@ correct_ans = 0
 wrong_ans = 0
 selected_emotions = []
 
-# TTS uses TTS_script speak 
 def text_audio(text):
     tts.speak(text)
     print(text)
@@ -100,28 +100,6 @@ def text_audio(text):
 
 text_audio("Test")
 
-
-# Save session data as a json
-def save_session_log():
-    log_file = "session_log.json"
-
-    if os.path.exists(log_file):
-        with open(log_file, 'r') as f:
-            previous_data = json.load(f)
-    else:
-        previous_data = []
-
-    previous_data.append({
-        "correct": correct_ans,
-        "wrong": wrong_ans,
-        "responses": session_data
-    })
-
-    with open(log_file, 'w') as f:
-        json.dump(previous_data, f, indent=2)
-
-
-# Defines the correct emotion and calls robot to excute emotion 
 def emotion_button(selected_emotion, correct_emotion, score_label, root, story_index):
     global correct_ans, wrong_ans
     if selected_emotion == correct_emotion:
@@ -135,7 +113,6 @@ def emotion_button(selected_emotion, correct_emotion, score_label, root, story_i
     total = correct_ans + wrong_ans
     score_label.config(text=f"Score:{correct_ans} / {total}")
 
-# Show the results of the storys based on the right and wrong emotions
 def show_results(window):
     for widget in window.winfo_children():
         widget.destroy()
@@ -145,12 +122,10 @@ def show_results(window):
     final_score_label.pack(pady=20)
 
     plot_results(window)
-    show_stuggled_emotions(window)
 
     restart_button = tk.Button(window, text="Restart Quiz", command=lambda: restart_game(window), font=("Nunito", 20))
     restart_button.pack(pady=20)
 
-# Plots the results of the
 def plot_results(window):
     correct_answers = defaultdict(int)
     wrong_answers = defaultdict(int)
@@ -190,22 +165,6 @@ def restart_game(window):
     wrong_ans = 0
     selected_emotions = []
 
-    show_story(window, 0)
-
-def retry_struggled_emotions(window):
-    global stories, correct_ans, wrong_ans, selected_emotions, session_data
-
-    retry_stories = [s for s in stories if s.correct_emotion in struggled_emotions]
-    if not retry_stories:
-        text_audio("No emotions to retry!")
-        return
-
-    correct_ans = 0
-    wrong_ans = 0
-    selected_emotions = []
-    session_data = []
-    random.shuffle(retry_stories)
-    stories[:] = retry_stories[:MAX_QUESTIONS]
     show_story(window, 0)
 
 
@@ -311,23 +270,6 @@ def show_instructions(window):
     start_button = tk.Button(window, text="Start", command=lambda: show_story(window, 0), font=("Nunito", 20))
     start_button.pack(pady=20)
 
-def show_struggled_emotions(window):
-    if not struggled_emotions:
-        return
-
-    suggestion_text = "You seemed to struggle with these emotions:\n"
-    for emotion, count in struggled_emotions.items():
-        if count > 0:
-            suggestion_text += f"- {emotion} (missed {count} times)\n"
-
-    label = tk.Label(window, text=suggestion_text, font=("Nunito", 18), fg="red", justify="center")
-    label.pack(pady=10)
-
-    retry_button = tk.Button(window, text="Retry These Emotions", font=("Nunito", 18), command=lambda: retry_struggled_emotions(window))
-    retry_button.pack(pady=10)
-
-
-
 def run_storytelling():
     root = tk.Tk()
     root.geometry("1440x900")
@@ -338,5 +280,5 @@ def run_storytelling():
 
 
 
-if __name__ == "__main__":
-    run_storytelling()
+
+run_storytelling()

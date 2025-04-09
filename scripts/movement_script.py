@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import rospy
 import sys
+import rospy
 from std_msgs.msg import String
 from geometry_msgs.msg import Twist
 import os
@@ -14,8 +15,10 @@ class Turtlebot:
 
 
         self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=10)
+        rospy.sleep(1)  
 
-        # Array of emotions movesments (duration,linar_velocity, angular_velocityt)
+        #Array of emotions movesments (duration,linar_velocity, angular_velocityt)
+
         self.emotion = {
             "excited" : [( 2, 0.4, 2), (2, 0.4, 2), (1, 0.6, 0)],
             "sad" : [(1.5,-0.2,0.55),(1.5,-0.2,-0.6)],
@@ -38,11 +41,11 @@ class Turtlebot:
             "tired": ["tired", "exhausted", "fatigued"],
             "neutral": ["neutral", "calm", "indifferent"]
         }
-
         
 
-    # Defintion the movement interaction with the script and ROS using (Duration, Linear velocity and angular velocity)
+        
     def autonomousMovement(self,duration, linear_vel, angular_vel):
+
         move_cmd = Twist()
         move_cmd.linear.x = linear_vel
         move_cmd.angular.z = angular_vel
