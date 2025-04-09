@@ -1,0 +1,7 @@
+<launch>
+  <!-- Launch Gazebo with TurtleBot3 -->
+  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch"/>
+
+  <!-- Run the emotion-based movement node -->
+  <node pkg="emotion_based_turtlebot" type="emotion_based_movement.py" name="emotion_based_movement" output="screen"/>
+</launch>
