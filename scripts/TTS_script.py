@@ -1,40 +1,58 @@
 #!/usr/bin/env python3
-
 import rospy
 import os
-from sound_play.libsoundplay import SoundClient
-
-#!/usr/bin/env python3
-
-import rospy
-import os
+import requests
 from sound_play.libsoundplay import SoundClient
 
 class TextToSpeech:
-    def __init__(self):
+    def __init__(self, flask_url):
         if not rospy.core.is_initialized():
             rospy.init_node('text_to_speech_node', anonymous=True)
+
+        self.flask_url = flask_url
         self.sound_client = SoundClient()
-        rospy.sleep(1)  # Allow time for sound_play to start
+        rospy.sleep(1)
 
     def speak(self, text):
-        """Convert text to speech using ROS sound_play"""
-        rospy.loginfo(f"Speaking: {text}")
+        """Request emotional TTS and play it using sound_play in ROS"""
+        rospy.loginfo(f"[TTS] Requesting: '{text}' with emotion: {emotion}")
         
-        # Stop any currently playing sound before starting a new one
-        rospy.sleep(1)
-        self.sound_client.stopAll()
-        rospy.loginfo("Stopping current sound.")
+        # Prepare payload with optional emotion (you can add this to your Flask API if supported)
+        payload = {
+            "text": text,
+        }
 
-        # Play the new sound
-        self.sound_client.say(text, volume=1.0, pitch=1.5, speed=100)
+        try:
+            # POST request to your Flask TTS server
+            response = requests.post(self.flask_url, json=payload)
+            response.raise_for_status()  # Raise error for HTTP error codes
 
-    
+            if response.status_code == 200:
+                # Save audio to a temp file (could remove the duplicate save)
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+                    temp_audio.write(response.content)
+                    temp_path = temp_audio.name
+                
+                rospy.loginfo(f"[TTS] Saved temp audio to: {temp_path}")
 
-# Only run if executed as a script
+                # Stop any currently playing sounds to avoid overlap
+                self.sound_client.stopAll()
+                rospy.sleep(0.5)  # Small pause to ensure stop is processed
+                
+                # Play the new TTS audio
+                self.sound_client.playWave(temp_path)
+                rospy.loginfo(f"[TTS] Playing audio...")
+
+        except Exception as e:
+            rospy.logerr(f"[TTS ERROR] {e}")
+
 if __name__ == "__main__":
-    tts = TextToSpeech()
-    rospy.loginfo("TTS Node is running...")
-    tts.speak("Text-to-speech module is ready.")
-    rospy.spin()
+    flask_tts_url = "http://192.168.68.60:5000/speak"  # Replace with your Flask server URL
 
+    tts = TextToSpeech(flask_url=flask_tts_url)
+    rospy.loginfo("Emotional TTS Node is ready.")
+
+    # Test
+    tts.speak("Hi, I am excited to see you!")
+
+    rospy.spin()
