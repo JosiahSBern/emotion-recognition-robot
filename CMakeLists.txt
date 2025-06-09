@@ -11,7 +11,6 @@ catkin_package()
 catkin_install_python(PROGRAMS
   scripts/TTS_script.py
   scripts/movement_script.py
-  scripts/story_script
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
